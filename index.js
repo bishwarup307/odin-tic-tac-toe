@@ -66,8 +66,9 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
     x2D = get2dIndex(xCells);
     o2D = get2dIndex(oCells);
 
-    if (isWin(x2D)) console.log("first player wins");
-    if (isWin(o2D)) console.log("second player wins");
+    if (isWin(x2D)) return 1;
+    if (isWin(o2D)) return 2;
+    return 0;
   };
 
   const printBoard = () => {
@@ -85,16 +86,64 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
       boardState += marker + "|";
       if (cell.index % dimension === dimension - 1) drawLine();
     }
-    return boardState.slice(0, -1);
+    console.log(boardState.slice(0, -1));
   };
 
   return { getAvailableCells, mark, getBoard, evaluateState, printBoard };
 };
 
-const myBoard = gameBoard();
-myBoard.mark(0, 1);
-myBoard.mark(4, 1);
-myBoard.mark(8, 1);
+const gameHandler = () => {
+  const firstPlayer = { name: "John", marker: "X", index: 1 };
+  const secondPlayer = { name: "Robbie", marker: "O", index: 2 };
 
-console.log(myBoard.printBoard());
-console.log(myBoard.evaluateState());
+  let newBoard;
+  let activePlayer;
+
+  const initializeGame = () => {
+    activePlayer = firstPlayer;
+    newBoard = gameBoard();
+    newBoard.printBoard();
+  };
+
+  const switchPlayer = () => {
+    activePlayer = activePlayer === firstPlayer ? secondPlayer : firstPlayer;
+  };
+
+  const askChoice = (cells) => {
+    const x = prompt(
+      `It's ${activePlayer.name}'s turn. Choose a cell from the list: ${cells}`
+    );
+    if (!cells.includes(Number(x))) throw new Error("Invalid choice made");
+    return Number(x);
+  };
+
+  const playNextTurn = () => {
+    const playerChoice = askChoice(newBoard.getAvailableCells());
+    newBoard.mark(playerChoice, activePlayer.index);
+    newBoard.printBoard();
+    outcome = newBoard.evaluateState();
+    return outcome;
+  };
+
+  const playNewGame = () => {
+    initializeGame();
+    let gameOver = false;
+
+    while (!gameOver && newBoard.getAvailableCells().length > 0) {
+      const roundResult = playNextTurn();
+      gameOver = roundResult > 0;
+      switchPlayer();
+    }
+
+    if (gameOver === 0) console.log("It's a TIE");
+    else {
+      const winner = gameOver === 1 ? firstPlayer : secondPlayer;
+      console.log(`WoHoo! ${winner.name} wins this round.`);
+    }
+  };
+
+  return { playNewGame };
+};
+
+const controller = gameHandler();
+controller.playNewGame();
