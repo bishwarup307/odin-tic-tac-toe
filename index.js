@@ -362,6 +362,34 @@ const gameHandler = (firstPlayer, secondPlayer) => {
       boardDiv.removeChild(boardDiv.firstChild);
     }
 
+    const curtain = document.createElement("div");
+    curtain.classList.add("curtain");
+
+    // const gameOverMessage = document.createElement("p");
+    // gameOverMessage.classList.add("gameover-message");
+    // gameOverMessage.textContent = "game over";
+
+    // const winnerDiv = document.createElement("div");
+    const celebration = document.createElement("img");
+    celebration.src = "./assets/images/celebration.gif";
+    celebration.alt = "celebration";
+    celebration.classList.add("celebration");
+    const winningPlayer = document.createElement("p");
+    winningPlayer.classList.add("gameover-message");
+
+    const btnNewGame = document.createElement("button");
+    btnNewGame.classList.add("new-game");
+    btnNewGame.textContent = "New Game";
+
+    // winnerDiv.appendChild(celebration);
+    // winnerDiv.appendChild(winningPlayer);
+
+    curtain.appendChild(celebration);
+    curtain.appendChild(winningPlayer);
+    curtain.appendChild(btnNewGame);
+
+    boardDiv.appendChild(curtain);
+
     for (let i = 0; i < newBoard.dimension * newBoard.dimension; i++) {
       const cell = document.createElement("div");
       cell.classList.add("board-cell");
@@ -380,6 +408,8 @@ const gameHandler = (firstPlayer, secondPlayer) => {
           else {
             const winner = outcome === 1 ? firstPlayer : secondPlayer;
             console.log(`WoHoo! ${winner.name} wins this round.`);
+            winningPlayer.textContent = `${winner.name} won!`;
+            setTimeout(() => (curtain.style.display = "flex"), "700");
           }
 
           switchPlayer();
@@ -389,6 +419,12 @@ const gameHandler = (firstPlayer, secondPlayer) => {
       });
     }
   };
+
+  // const hideBoard = () => {
+  //   const board = document.querySelector(".board");
+  //   const curtain = document.createElement("div");
+
+  // }
 
   const initializeGame = () => {
     activePlayer = firstPlayer;
