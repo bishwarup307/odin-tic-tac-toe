@@ -51,6 +51,10 @@
   font-weight: 600;
 }
 
+.fw800 {
+  font-weight: 800;
+}
+
 .btn {
   border: 2px solid transparent;
   border-radius: 8px;

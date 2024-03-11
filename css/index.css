@@ -19,7 +19,7 @@
 
 @font-face {
   font-family: "Platipy";
-  src: url("../assets/fonts/Platypi.woff2") format("woff2");
+  src: url("../assets/fonts/Kreadon.woff2") format("woff2");
 }
 
 * {
@@ -28,6 +28,7 @@
   box-sizing: border-box;
   scroll-behavior: smooth;
   font-family: "Platipy", serif;
+  font-weight: 500;
 }
 
 ul {
@@ -40,7 +41,7 @@ a {
 }
 
 body {
-  padding-top: 4rem;
+  padding: 2rem 1rem;
 }
 
 .container {
@@ -50,16 +51,19 @@ body {
 }
 
 main {
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 1fr;
   gap: 4rem;
-  width: 900px;
-  height: 700px;
+  max-width: 900px;
+  /* height: 700px; */
   margin: 0 auto;
 }
 
 .info {
   grid-template-columns: 1fr;
-  background-color: #f5f5f5;
+  background-color: hsl(0, 0%, 96%);
+  box-shadow: 2px 2px 10px rgb(0 0 0/ 10%);
+  border: 1px solid #ccc;
+  border-radius: 8px;
   align-items: center;
   align-content: start;
   gap: 1rem;
@@ -76,20 +80,20 @@ main {
       /* background-color: #bbb; */
       border: 1px solid #ccc;
       /* padding: 1rem; */
-      height: 60px;
-      width: 60px;
+      height: 40px;
+      width: 40px;
       border-radius: 50%;
       flex-shrink: 0;
     }
 
     .player-name {
-      font-size: 1.5rem;
-      max-width: 200px;
+      font-size: clamp(0.7rem, 0.5rem + 2vw, 1.5rem);
+      width: 150px;
       border: 1px solid #ccc;
       background-color: transparent;
       border-radius: 50vh;
-      padding-inline: 1rem;
-      padding-bottom: 0.5rem;
+      /* padding-inline: 0.5rem; */
+      padding-bottom: 0.25rem;
       text-align: center;
 
       &:focus {
@@ -100,8 +104,8 @@ main {
 
     .player-color {
       overflow: hidden;
-      width: 40px;
-      height: 40px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       /* border: 2px solid black; */
       display: flex;
@@ -145,12 +149,16 @@ main {
 
 .pick-avatar {
   padding: 2rem;
-  min-width: 800px;
+  min-width: 300px;
   left: 50%;
   top: 50%;
   transform: translateX(-50%) translateY(-50%);
   border: 1px solid #ccc;
   border-radius: 8px;
+
+  &::backdrop {
+    background: rgb(0 0 0/ 60%);
+  }
 
   &:foucs,
   &:active {
@@ -159,8 +167,8 @@ main {
 }
 
 .dialog-grid {
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 0.5rem;
   place-items: center;
 }
 
@@ -170,8 +178,8 @@ main {
 }
 
 .card .avatar-icon {
-  width: 40px;
-  height: 40px;
+  width: 20px;
+  height: 20px;
 }
 
 .dialog-choice {
@@ -182,5 +190,60 @@ main {
 
   :focus {
     background-color: #bbb;
+  }
+}
+
+@media only screen and (min-width: 450px) {
+  body {
+    padding: 4rem 2rem;
+  }
+
+  .player-name {
+    width: 200px !important;
+  }
+
+  .avatar {
+    height: 60px !important;
+    width: 60px !important;
+  }
+
+  .card .avatar-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pick-avatar {
+    width: clamp(300px, 60vw, 800px);
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  main {
+    grid-template-columns: auto 1fr;
+  }
+
+  .info {
+    padding: 2rem;
+  }
+
+  .avatar {
+    height: 70px !important;
+    width: 70px !important;
+  }
+
+  .player-name {
+    height: 70px;
+    padding-bottom: 0.5rem;
+    padding-inline: 1rem;
+  }
+
+  .player-color {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .dialog-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
   }
 }
