@@ -332,8 +332,9 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
     for (let i = 0; i < dimension * dimension; i++) {
       // console.log(board[i]);
       if (board[i].marker > 0) {
-        document.querySelector(`#cell-${i}`).innerHTML =
-          markers[board[i].marker];
+        const cell = document.querySelector(`#cell-${i}`);
+        cell.innerHTML = markers[board[i].marker];
+        cell.classList.add("occupied");
       }
     }
   };
