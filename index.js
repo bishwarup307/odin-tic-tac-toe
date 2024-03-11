@@ -381,6 +381,8 @@ const gameHandler = (firstPlayer, secondPlayer) => {
     btnNewGame.classList.add("new-game");
     btnNewGame.textContent = "New Game";
 
+    btnNewGame.addEventListener("click", startNewGame);
+
     // winnerDiv.appendChild(celebration);
     // winnerDiv.appendChild(winningPlayer);
 
@@ -479,6 +481,11 @@ const makePlayer = (id, index, name, color, marker) => {
   const incrementScore = () => score++;
   const getScore = () => score;
 
+  // const changeName = (newName) => {
+  //   name = newName;
+  //   localStorage.setItem(id, )
+  // }
+
   return { id, name, index, color, marker, getScore, incrementScore };
 };
 
@@ -504,6 +511,7 @@ const createPlayerCards = function (player) {
   playerName.addEventListener("change", () => {
     console.log(`${player.name} is now known as ${playerName.value}`);
     player.name = playerName.value;
+    localStorage.setItem(player.id, JSON.stringify(player));
   });
 
   const playerColor = document.createElement("div");
@@ -518,6 +526,7 @@ const createPlayerCards = function (player) {
   colorPicker.addEventListener("change", () => {
     console.log(`${player.name} chose a new color ${colorPicker.value}`);
     player.color = colorPicker.value;
+    localStorage.setItem(player.id, JSON.stringify(player));
   });
 
   card.appendChild(avatar);
@@ -556,6 +565,7 @@ const createPlayerCards = function (player) {
       ).svg;
       player.marker = newAvatar;
       avatar.innerHTML = newAvatar;
+      localStorage.setItem(player.id, JSON.stringify(player));
       dialogBody.close();
     });
 
@@ -563,14 +573,52 @@ const createPlayerCards = function (player) {
   });
 };
 
-const player1 = makePlayer("p1", 1, "Player 1", "#db154a", DEFAULT_MARKER_1);
-const player2 = makePlayer("p2", 2, "Player 2", "#15dbb3", DEFAULT_MARKER_2);
+const createPlayers = () => {
+  let player1 = JSON.parse(localStorage.getItem("p1"));
+  let player2 = JSON.parse(localStorage.getItem("p2"));
 
+  if (player1)
+    player1 = makePlayer(
+      player1.id,
+      player1.index,
+      player1.name,
+      player1.color,
+      player1.marker
+    );
+  else player1 = makePlayer("p1", 1, "Player 1", "#db154a", DEFAULT_MARKER_1);
+
+  if (player2)
+    player2 = makePlayer(
+      player2.id,
+      player2.index,
+      player2.name,
+      player2.color,
+      player2.marker
+    );
+  else player2 = makePlayer("p2", 2, "Player 2", "#15dbb3", DEFAULT_MARKER_2);
+
+  // localStorage.setItem(player1.id, JSON.stringify(player1));
+  // localStorage.setItem(player2.id, JSON.stringify(player2));
+
+  return [player1, player2];
+};
+
+// const player1 = makePlayer("p1", 1, "Player 1", "#db154a", DEFAULT_MARKER_1);
+// const player2 = makePlayer("p2", 2, "Player 2", "#15dbb3", DEFAULT_MARKER_2);
+
+// localStorage.setItem(player1.id, JSON.stringify(player1));
+// localStorage.setItem(player2.id, JSON.stringify(player2));
+
+let [player1, player2] = createPlayers();
 createPlayerCards(player1);
 createPlayerCards(player2);
 
-const controller = gameHandler(player1, player2);
-controller.playNewGame();
+const startNewGame = () => {
+  const controller = gameHandler(player1, player2);
+  controller.playNewGame();
+};
+
+startNewGame();
 
 // const gb = gameBoard();
 // gb.makeBoard();
