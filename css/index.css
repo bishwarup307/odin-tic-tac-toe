@@ -139,8 +139,23 @@ main {
 }
 
 .board {
-  background: #ccc;
+  /* background: #ccc; */
   border: 2px solid darkolivegreen;
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  grid-template-rows: repeat(3, 80px);
+}
+
+.board-cell {
+  border: 1px solid #a7a7a7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-cell .avatar-icon {
+  width: 50px;
+  height: 50px;
 }
 
 .title {

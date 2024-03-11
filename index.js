@@ -219,6 +219,8 @@ const DEFAULT_MARKER_2 = `<svg class="avatar-icon" viewBox="0 0 24 24" fill="non
 const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
   const board = [];
 
+  playerMarkers = markers;
+
   // Each position holds an object containing the
   // cell position and the marker. The marker is an integer
   // indicating the player index (e.g. 1 or 2). All unoccupied
@@ -230,8 +232,16 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
     return board.filter((cell) => cell.marker === 0).map((cell) => cell.index);
   };
 
+  const updateMarkers = (markers) => {
+    playerMarkers = markers;
+  };
+
   const mark = (cell, playerIndex) => {
+    // console.log(`${cell} : ${playerIndex}`);
+    if (board[cell].marker > 0)
+      alert("This cell is already occupied, choose a different cell");
     board[cell].marker = playerIndex;
+    // console.log(board);
   };
 
   const getBoard = () => board;
@@ -265,16 +275,45 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
   };
 
   const isWin = (indices2d) => {
-    const rowUniques = findUniques(indices2d.rowIndices);
-    const columnUniques = findUniques(indices2d.columnIndices);
+    // const rowUniques = findUniques(indices2d.rowIndices);
+    // const columnUniques = findUniques(indices2d.columnIndices);
 
-    windCondtition1 =
-      rowUniques.length === 1 && columnUniques.length === dimension; // horizontal streak
-    windCondtition2 =
-      rowUniques.length === dimension && columnUniques.length === 1; // vertical streak
-    windCondtition3 = isDiagonalStreak(indices2d);
+    // windCondtition1 =
+    //   rowUniques.length === 1 && columnUniques.length === dimension; // horizontal streak
+    // windCondtition2 =
+    //   rowUniques.length === dimension && columnUniques.length === 1; // vertical streak
+    windCondtition1 = isHorizontalOrVerticalStreak(indices2d);
+    windCondtition2 = isDiagonalStreak(indices2d);
 
-    return windCondtition1 || windCondtition2 || windCondtition3;
+    return windCondtition1 || windCondtition2;
+  };
+
+  const isHorizontalOrVerticalStreak = (indices2d) => {
+    let { rowIndices, columnIndices } = indices2d;
+
+    let rowCounter = {};
+    let columnCounter = {};
+
+    for (let i = 0; i < indices2d.rowIndices.length; i++) {
+      if (rowCounter[rowIndices[i]])
+        rowCounter[rowIndices[i]].push(columnIndices[i]);
+      else rowCounter[rowIndices[i]] = [columnIndices[i]];
+
+      if (columnCounter[columnIndices[i]])
+        columnCounter[columnIndices[i]].push(rowIndices[i]);
+      else columnCounter[columnIndices[i]] = [rowIndices[i]];
+    }
+
+    // console.log(rowCounter);
+    // console.log(columnCounter);
+
+    for (rowIndex in rowCounter) {
+      if (rowCounter[rowIndex].length === dimension) return true;
+    }
+    for (colIndex in columnCounter) {
+      if (columnCounter[colIndex].length === dimension) return true;
+    }
+    return false;
   };
 
   const evaluateState = () => {
@@ -290,36 +329,70 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
   };
 
   const printBoard = () => {
-    let boardState = "";
-    const drawLine = () => {
-      boardState += "\n|";
-      for (let i = 0; i < 6 * dimension; i++) boardState += "-";
-      boardState += "\n|";
-    };
-
-    drawLine();
-    for (let cell of board) {
-      let marker = markers[cell.marker] || "-";
-      marker = "  " + marker + "  ";
-      boardState += marker + "|";
-      if (cell.index % dimension === dimension - 1) drawLine();
+    for (let i = 0; i < dimension * dimension; i++) {
+      // console.log(board[i]);
+      if (board[i].marker > 0) {
+        document.querySelector(`#cell-${i}`).innerHTML =
+          markers[board[i].marker];
+      }
     }
-    console.log(boardState.slice(0, -1));
   };
 
-  return { getAvailableCells, mark, getBoard, evaluateState, printBoard };
+  return {
+    dimension,
+    getAvailableCells,
+    mark,
+    getBoard,
+    evaluateState,
+    printBoard,
+  };
 };
 
 const gameHandler = (firstPlayer, secondPlayer) => {
-  //   const firstPlayer = { name: "John", marker: "X", index: 1 };
-  //   const secondPlayer = { name: "Robbie", marker: "O", index: 2 };
-
   let newBoard;
   let activePlayer;
+  let gameOver = false;
+
+  const makeBoard = () => {
+    const boardDiv = document.querySelector(".board");
+
+    // Remove everything from before for a new game;
+    while (boardDiv.firstChild) {
+      boardDiv.removeChild(boardDiv.firstChild);
+    }
+
+    for (let i = 0; i < newBoard.dimension * newBoard.dimension; i++) {
+      const cell = document.createElement("div");
+      cell.classList.add("board-cell");
+      cell.id = `cell-${i}`;
+      boardDiv.appendChild(cell);
+
+      cell.addEventListener("click", (event) => {
+        if (!gameOver && newBoard.getAvailableCells().length > 0) {
+          let cellIndex = Number(
+            event.target.closest(".board-cell").id.split("-")[1]
+          );
+          outcome = playNextTurn(cellIndex);
+          gameOver = outcome > 0;
+
+          if (outcome === 0) console.log("It's a TIE");
+          else {
+            const winner = outcome === 1 ? firstPlayer : secondPlayer;
+            console.log(`WoHoo! ${winner.name} wins this round.`);
+          }
+
+          switchPlayer();
+        } else {
+          return false;
+        }
+      });
+    }
+  };
 
   const initializeGame = () => {
     activePlayer = firstPlayer;
-    newBoard = gameBoard();
+    newBoard = gameBoard(3, { 1: firstPlayer.marker, 2: secondPlayer.marker });
+    makeBoard();
     newBoard.printBoard();
   };
 
@@ -335,8 +408,8 @@ const gameHandler = (firstPlayer, secondPlayer) => {
     return Number(x);
   };
 
-  const playNextTurn = () => {
-    const playerChoice = askChoice(newBoard.getAvailableCells());
+  const playNextTurn = (playerChoice) => {
+    // const playerChoice = askChoice(newBoard.getAvailableCells());
     newBoard.mark(playerChoice, activePlayer.index);
     newBoard.printBoard();
     outcome = newBoard.evaluateState();
@@ -345,31 +418,31 @@ const gameHandler = (firstPlayer, secondPlayer) => {
 
   const playNewGame = () => {
     initializeGame();
-    let gameOver = false;
+    // let gameOver = false;
 
-    while (!gameOver && newBoard.getAvailableCells().length > 0) {
-      const roundResult = playNextTurn();
-      gameOver = roundResult > 0;
-      switchPlayer();
-    }
+    // while (!gameOver && newBoard.getAvailableCells().length > 0) {
+    //   const roundResult = playNextTurn();
+    //   gameOver = roundResult > 0;
+    //   switchPlayer();
+    // }
 
-    if (gameOver === 0) console.log("It's a TIE");
-    else {
-      const winner = gameOver === 1 ? firstPlayer : secondPlayer;
-      console.log(`WoHoo! ${winner.name} wins this round.`);
-    }
+    // if (gameOver === 0) console.log("It's a TIE");
+    // else {
+    //   const winner = gameOver === 1 ? firstPlayer : secondPlayer;
+    //   console.log(`WoHoo! ${winner.name} wins this round.`);
+    // }
   };
 
   return { playNewGame };
 };
 
-const makePlayer = (id, name, color, marker) => {
+const makePlayer = (id, index, name, color, marker) => {
   let score = 0;
 
   const incrementScore = () => score++;
   const getScore = () => score;
 
-  return { id, name, color, marker, getScore, incrementScore };
+  return { id, name, index, color, marker, getScore, incrementScore };
 };
 
 // const controller = gameHandler();
@@ -453,8 +526,14 @@ const createPlayerCards = function (player) {
   });
 };
 
-const player1 = makePlayer("p1", "Player 1", "#db154a", DEFAULT_MARKER_1);
-const player2 = makePlayer("p2", "Player 2", "#15dbb3", DEFAULT_MARKER_2);
+const player1 = makePlayer("p1", 1, "Player 1", "#db154a", DEFAULT_MARKER_1);
+const player2 = makePlayer("p2", 2, "Player 2", "#15dbb3", DEFAULT_MARKER_2);
 
 createPlayerCards(player1);
 createPlayerCards(player2);
+
+const controller = gameHandler(player1, player2);
+controller.playNewGame();
+
+// const gb = gameBoard();
+// gb.makeBoard();
