@@ -155,7 +155,7 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
 
     if (xStreak.length > 0) return { result: 1, streak: xStreak.sort() };
     if (oStreak.length > 0) return { result: 2, streak: oStreak.sort() };
-    return { result: 0, streak: [] };
+    return { result: 0, streak: [], remaining: getAvailableCells().length };
   };
 
   const printBoard = () => {

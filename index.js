@@ -130,6 +130,31 @@ const viewController = () => {
         handleResult(result);
       });
     }
+
+    /* 
+      Game over screen (hidden initially)
+    */
+    const curtain = document.createElement("div");
+    curtain.classList.add("curtain");
+
+    const celebration = document.createElement("img");
+    celebration.src = "./assets/images/celebration.gif";
+    celebration.alt = "celebration";
+    celebration.classList.add("celebration");
+    const winningPlayer = document.createElement("p");
+    winningPlayer.classList.add("gameover-message");
+
+    const btnNewGame = document.createElement("button");
+    btnNewGame.classList.add("new-game");
+    btnNewGame.textContent = "New Game";
+
+    btnNewGame.addEventListener("click", load);
+
+    curtain.appendChild(celebration);
+    curtain.appendChild(winningPlayer);
+    curtain.appendChild(btnNewGame);
+
+    boardDiv.appendChild(curtain);
   };
 
   const renderBoard = () => {
@@ -158,20 +183,31 @@ const viewController = () => {
   };
 
   const handleResult = (result) => {
-    if (result.result === 0) return;
+    if (result.result === 0 && result.remaining > 0) return;
     else {
       // disable board cells for click
       document
         .querySelectorAll(".board-cell")
         .forEach((cell) => cell.classList.add("disabled"));
     }
-    let animationDelay = 0;
+    // let animationDelay = 0;
 
     for (let cellIndex of result.streak) {
       const winningCell = document.querySelector(`#cell-${cellIndex}`);
       setTimeout(() => winningCell.classList.add("win"), `{animationDelay}`);
-      animationDelay += 1000;
+      // animationDelay += 3000;
     }
+
+    const curtain = document.querySelector(".curtain");
+    const gameOverMessage = document.querySelector(".gameover-message");
+
+    let message;
+    if (result.result == 0) message = "It's a tie!";
+    else if (result.result === 1) message = `${player1.getInfo().name} won!`;
+    else if (result.result === 2) message = `${player2.getInfo().name} won!`;
+
+    gameOverMessage.textContent = message;
+    setTimeout(() => (curtain.style.display = "flex"), "1500");
   };
 
   const handleChangeAvatar = (e, player, avatar) => {
