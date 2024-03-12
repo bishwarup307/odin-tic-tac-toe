@@ -29,9 +29,10 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
   const mark = (cell, playerIndex) => {
     if (board[cell].value > 0) {
       alert("This cell is already occupied, choose a different cell");
-      return;
+      return false;
     }
     board[cell].value = playerIndex;
+    return true;
   };
 
   const getBoard = () => board;
@@ -200,9 +201,12 @@ const gameController = (firstPlayer, secondPlayer, boardDimension = 3) => {
   };
 
   const playNextTurn = (cellIndex) => {
-    newBoard.mark(cellIndex, activePlayer.getInfo().index);
+    const isMarkSuccess = newBoard.mark(
+      cellIndex,
+      activePlayer.getInfo().index
+    );
     const outcome = newBoard.evaluateState();
-    switchPlayer();
+    if (isMarkSuccess) switchPlayer();
     return outcome;
   };
 
