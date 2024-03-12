@@ -27,11 +27,11 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
     Updates the board state by marking a cell (updating its value) with a player index
     */
   const mark = (cell, playerIndex) => {
-    if (board[cell].marker > 0) {
+    if (board[cell].value > 0) {
       alert("This cell is already occupied, choose a different cell");
       return;
     }
-    board[cell].marker = playerIndex;
+    board[cell].value = playerIndex;
   };
 
   const getBoard = () => board;
@@ -97,19 +97,19 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
 
   /* Checks for all the win conditions */
   const isWin = (indices2d) => {
-    windCondtition1 = isHorizontalOrVerticalStreak(indices2d);
-    windCondtition2 = isDiagonalStreak(indices2d);
+    const winCondition1 = isHorizontalOrVerticalStreak(indices2d);
+    const winCondition2 = isDiagonalStreak(indices2d);
 
-    return windCondtition1 || windCondtition2;
+    return winCondition1 || winCondition2;
   };
 
   /* Checks for a win given a specific board state */
   const evaluateState = () => {
-    xCells = board.filter((cell) => cell.marker == 1); // first player marks
-    oCells = board.filter((cell) => cell.marker == 2); // second player marks
+    const xCells = board.filter((cell) => cell.marker == 1); // first player marks
+    const oCells = board.filter((cell) => cell.marker == 2); // second player marks
 
-    x2D = get2dIndex(xCells);
-    o2D = get2dIndex(oCells);
+    const x2D = get2dIndex(xCells);
+    const o2D = get2dIndex(oCells);
 
     if (isWin(x2D)) return 1; // first player wins
     if (isWin(o2D)) return 2; // second player wins
@@ -159,10 +159,10 @@ const gameController = (firstPlayer, secondPlayer, boardDimension = 3) => {
   };
 
   const playNextTurn = (cellIndex) => {
-    newBoard.mark(cellIndex, activePlayer.index);
-    outcome = newBoard.evaluateState();
+    newBoard.mark(cellIndex, activePlayer.getInfo().index);
+    const outcome = newBoard.evaluateState();
     switchPlayer();
-    return { outcome, activePlayer };
+    return outcome;
   };
 
   return { startGame, getBoardState, switchPlayer, playNextTurn };

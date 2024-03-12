@@ -86,13 +86,17 @@ const createPlayerCards = function (player) {
 };
 
 const viewController = () => {
+  let controller;
+  let player1;
+  let player2;
+
   const load = () => {
-    let [player1, player2] = createPlayers(); // Create new players or load them from the cache
+    [player1, player2] = createPlayers(); // Create new players or load them from the cache
 
     const p1Widgets = createPlayerCards(player1); // Render the player1 widgets - avatar, name and color
     const p2Widgets = createPlayerCards(player2); // Render the player2 widgets - avatar, name and color
 
-    const controller = gameController(player1, player2, BOARD_DIMENSION); // Get a new board controller
+    controller = gameController(player1, player2, BOARD_DIMENSION); // Get a new board controller
     controller.startGame(); // start a new game
     getBlankBoard();
 
@@ -125,20 +129,26 @@ const viewController = () => {
         let cellIndex = Number(
           e.target.closest(".board-cell").id.split("-")[1]
         );
-        outcome = playNextTurn(cellIndex);
+        const outcome = controller.playNextTurn(cellIndex);
+        console.log(controller.getBoardState());
+        renderBoard();
       });
     }
   };
 
   const renderBoard = () => {
+    const boardState = controller.getBoardState();
     for (let i = 0; i < BOARD_DIMENSION * BOARD_DIMENSION; i++) {
       /* 
       If the board cell is occupied fill it with the respective
       player's avatar
        */
-      if (board[i].value > 0) {
+      if (boardState[i].value > 0) {
         const cell = document.querySelector(`#cell-${i}`);
-        cell.innerHTML = board[i].value === 1 ? player1.avatar : player2.avatar;
+        cell.innerHTML =
+          boardState[i].value === 1
+            ? player1.getInfo().avatar
+            : player2.getInfo().avatar;
         cell.classList.add("occupied");
       }
     }
@@ -150,6 +160,7 @@ const viewController = () => {
     ).svg;
     player.editPlayer(newAvatar);
     avatar.innerHTML = newAvatar;
+    renderBoard();
   };
 
   return { load };
