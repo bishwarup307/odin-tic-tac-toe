@@ -92,3 +92,13 @@
   color: white;
   background: var(--clr-gray-600);
 }
+
+.disabled {
+  pointer-events: none;
+  /* background-color: #dfdfdf; */
+}
+
+.win {
+  background-color: rgb(7, 188, 88);
+  transition: background-color 4000ms;
+}

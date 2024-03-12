@@ -126,12 +126,8 @@ const viewController = () => {
       boardDiv.appendChild(cell);
 
       cell.addEventListener("click", (e) => {
-        let cellIndex = Number(
-          e.target.closest(".board-cell").id.split("-")[1]
-        );
-        const outcome = controller.playNextTurn(cellIndex);
-        console.log(outcome);
-        renderBoard();
+        const result = handleUserInput(e);
+        handleResult(result);
       });
     }
   };
@@ -151,6 +147,29 @@ const viewController = () => {
             : player2.getInfo().avatar;
         cell.classList.add("occupied");
       }
+    }
+  };
+
+  const handleUserInput = (e) => {
+    let cellIndex = Number(e.target.closest(".board-cell").id.split("-")[1]);
+    const outcome = controller.playNextTurn(cellIndex);
+    renderBoard();
+    return outcome;
+  };
+
+  const handleResult = (result) => {
+    if (result.result === 0) return;
+    else {
+      // disable board cells for click
+      document
+        .querySelectorAll(".board-cell")
+        .forEach((cell) => cell.classList.add("disabled"));
+    }
+    let animationDelay = 0;
+    for (let cellIndex of result.streak) {
+      const winningCell = document.querySelector(`#cell-${cellIndex}`);
+      setTimeout(() => winningCell.classList.add("win"), `{animationDelay}`);
+      animationDelay += 1000;
     }
   };
 

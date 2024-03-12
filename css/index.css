@@ -192,6 +192,7 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+  /* transition: background-color 300ms; */
 }
 
 .occupied {
