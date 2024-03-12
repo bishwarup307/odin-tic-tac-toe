@@ -96,9 +96,7 @@ const viewController = () => {
     const p1Widgets = createPlayerCards(player1); // Render the player1 widgets - avatar, name and color
     const p2Widgets = createPlayerCards(player2); // Render the player2 widgets - avatar, name and color
 
-    controller = gameController(player1, player2, BOARD_DIMENSION); // Get a new board controller
-    controller.startGame(); // start a new game
-    getBlankBoard();
+    newGame();
 
     p1Widgets.chooseAvatar.addEventListener("click", (e) => {
       handleChangeAvatar(e, player1, p1Widgets.avatar);
@@ -109,6 +107,12 @@ const viewController = () => {
       handleChangeAvatar(e, player2, p2Widgets.avatar);
       p2Widgets.dialog.close();
     });
+  };
+
+  const newGame = () => {
+    controller = gameController(player1, player2, BOARD_DIMENSION); // Get a new board controller
+    controller.startGame(); // start a new game
+    getBlankBoard();
   };
 
   const getBlankBoard = () => {
@@ -138,7 +142,7 @@ const viewController = () => {
     curtain.classList.add("curtain");
 
     const celebration = document.createElement("img");
-    celebration.src = "./assets/images/celebration.gif";
+    celebration.src = "./assets/images/celebration2.gif";
     celebration.alt = "celebration";
     celebration.classList.add("celebration");
     const winningPlayer = document.createElement("p");
@@ -148,7 +152,7 @@ const viewController = () => {
     btnNewGame.classList.add("new-game");
     btnNewGame.textContent = "New Game";
 
-    btnNewGame.addEventListener("click", load);
+    btnNewGame.addEventListener("click", newGame);
 
     curtain.appendChild(celebration);
     curtain.appendChild(winningPlayer);
