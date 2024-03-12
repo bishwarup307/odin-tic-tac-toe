@@ -36,12 +36,27 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
 
   const getBoard = () => board;
 
+  /* 
+  Calculates the 2D coordinates (row, column) of the board given
+  1D indices ranging from 0 to (dimension - 1)
+  */
   const get2dIndex = (indices) => {
     const rowIndices = indices.map((index) =>
       Math.floor(index.index / dimension)
     );
     const columnIndices = indices.map((index) => index.index % dimension);
     return { rowIndices, columnIndices };
+  };
+
+  const getCellIndex = (rowIdx, colIdx) => {
+    if (rowIdx.length !== colIdx.length)
+      throw new Error("row and column indices must have same length");
+
+    let cellIndices = [];
+    for (let i = 0; i < rowIdx.length; i++) {
+      cellIndices.push(dimension * rowIdx[i] + colIdx[i]);
+    }
+    return cellIndices;
   };
 
   /* 
@@ -51,6 +66,7 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
   const isDiagonalStreak = (indices2D) => {
     let primaryDiagonalStreak = 0;
     let secondaryDiagnoalStreak = 0;
+    let streak = [];
 
     for (let i = 0; i < indices2D.rowIndices.length; i++) {
       primaryDiagonalStreak +=
@@ -59,9 +75,18 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
         indices2D.rowIndices[i] === dimension - indices2D.columnIndices[i] - 1;
     }
 
-    return (
-      Math.max(primaryDiagonalStreak, secondaryDiagnoalStreak) >= dimension
-    );
+    if (primaryDiagonalStreak === dimension) {
+      streak = getCellIndex(
+        [...Array(dimension).keys()],
+        [...Array(dimension).keys()]
+      );
+    } else if (secondaryDiagnoalStreak === dimension) {
+      streak = getCellIndex([...Array(dimension).keys()].reverse(), [
+        ...Array(dimension).keys(),
+      ]);
+    }
+
+    return streak;
   };
 
   /* 
@@ -72,6 +97,7 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
     */
   const isHorizontalOrVerticalStreak = (indices2d) => {
     let { rowIndices, columnIndices } = indices2d;
+    let streak = [];
 
     let rowCounter = {};
     let columnCounter = {};
@@ -86,13 +112,22 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
       else columnCounter[columnIndices[i]] = [rowIndices[i]];
     }
 
-    for (rowIndex in rowCounter) {
-      if (rowCounter[rowIndex].length === dimension) return true;
+    for (let rowIndex in rowCounter) {
+      if (rowCounter[rowIndex].length === dimension) {
+        streak = getCellIndex(Array(dimension).fill(rowIndex), [
+          ...Array(dimension).keys(),
+        ]);
+      }
     }
-    for (colIndex in columnCounter) {
-      if (columnCounter[colIndex].length === dimension) return true;
+    for (let colIndex in columnCounter) {
+      if (columnCounter[colIndex].length === dimension) {
+        streak = getCellIndex(
+          [...Array(dimension).keys()],
+          Array(dimension).fill(colIndex)
+        );
+      }
     }
-    return false;
+    return streak;
   };
 
   /* Checks for all the win conditions */
@@ -100,20 +135,25 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
     const winCondition1 = isHorizontalOrVerticalStreak(indices2d);
     const winCondition2 = isDiagonalStreak(indices2d);
 
-    return winCondition1 || winCondition2;
+    if (winCondition1.length === dimension) return winCondition1;
+    if (winCondition2.length === dimension) return winCondition2;
+    return [];
   };
 
   /* Checks for a win given a specific board state */
   const evaluateState = () => {
-    const xCells = board.filter((cell) => cell.marker == 1); // first player marks
-    const oCells = board.filter((cell) => cell.marker == 2); // second player marks
+    const xCells = board.filter((cell) => cell.value == 1); // first player marks
+    const oCells = board.filter((cell) => cell.value == 2); // second player marks
 
     const x2D = get2dIndex(xCells);
     const o2D = get2dIndex(oCells);
 
-    if (isWin(x2D)) return 1; // first player wins
-    if (isWin(o2D)) return 2; // second player wins
-    return 0;
+    const xStreak = isWin(x2D);
+    const oStreak = isWin(o2D);
+
+    if (xStreak.length > 0) return { result: 1, streak: xStreak.sort() };
+    if (oStreak.length > 0) return { result: 2, streak: oStreak.sort() };
+    return { result: 0, streak: [] };
   };
 
   const printBoard = () => {

@@ -130,7 +130,7 @@ const viewController = () => {
           e.target.closest(".board-cell").id.split("-")[1]
         );
         const outcome = controller.playNextTurn(cellIndex);
-        console.log(controller.getBoardState());
+        console.log(outcome);
         renderBoard();
       });
     }
