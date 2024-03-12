@@ -103,9 +103,17 @@ const viewController = () => {
       p1Widgets.dialog.close();
     });
 
+    p1Widgets.colorPicker.addEventListener("change", (e) => {
+      renderBoard();
+    });
+
     p2Widgets.chooseAvatar.addEventListener("click", (e) => {
       handleChangeAvatar(e, player2, p2Widgets.avatar);
       p2Widgets.dialog.close();
+    });
+
+    p2Widgets.colorPicker.addEventListener("change", (e) => {
+      renderBoard();
     });
   };
 
@@ -174,6 +182,14 @@ const viewController = () => {
           boardState[i].value === 1
             ? player1.getInfo().avatar
             : player2.getInfo().avatar;
+        cell.firstChild.style.fill =
+          boardState[i].value === 1
+            ? player1.getInfo().color
+            : player2.getInfo().color;
+        cell.firstChild.style.stroke =
+          boardState[i].value === 1
+            ? player1.getInfo().color
+            : player2.getInfo().color;
         cell.classList.add("occupied");
       }
     }
