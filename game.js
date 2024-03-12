@@ -56,6 +56,7 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
     for (let i = 0; i < rowIdx.length; i++) {
       cellIndices.push(dimension * rowIdx[i] + colIdx[i]);
     }
+
     return cellIndices;
   };
 
@@ -114,7 +115,7 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
 
     for (let rowIndex in rowCounter) {
       if (rowCounter[rowIndex].length === dimension) {
-        streak = getCellIndex(Array(dimension).fill(rowIndex), [
+        streak = getCellIndex(Array(dimension).fill(Number(rowIndex)), [
           ...Array(dimension).keys(),
         ]);
       }
@@ -123,7 +124,7 @@ const gameBoard = function (dimension = 3, markers = { 1: "X", 2: "O" }) {
       if (columnCounter[colIndex].length === dimension) {
         streak = getCellIndex(
           [...Array(dimension).keys()],
-          Array(dimension).fill(colIndex)
+          Array(dimension).fill(Number(colIndex))
         );
       }
     }

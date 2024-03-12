@@ -166,6 +166,7 @@ const viewController = () => {
         .forEach((cell) => cell.classList.add("disabled"));
     }
     let animationDelay = 0;
+
     for (let cellIndex of result.streak) {
       const winningCell = document.querySelector(`#cell-${cellIndex}`);
       setTimeout(() => winningCell.classList.add("win"), `{animationDelay}`);
